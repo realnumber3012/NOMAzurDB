@@ -7,7 +7,8 @@ scalaVersion := "2.11.7"
 import Common._
 
 resolvers ++= Seq (
-  Akka.resolver
+  Akka.resolver,
+  Spray.resolver
 )
 
 libraryDependencies ++= Seq(
@@ -20,8 +21,16 @@ libraryDependencies ++= Seq(
   Akka.cluster_tools,
   Akka.multi_node_testkit,
   Akka.testKit,
+  Akka.http,
+  Akka.http_json,
   Akka.persistencePluginCasbah,
   Akka.persistencePluginInMemory % "test"
+)
+
+libraryDependencies ++= Seq(
+  Spray.http,
+  Spray.httpx,
+  Spray.json
 )
 
 scalacOptions ++= Seq("-feature", "-deprecation")

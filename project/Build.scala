@@ -17,6 +17,8 @@ object Common {
       val cluster = "com.typesafe.akka" %% "akka-cluster" % version
       val cluster_metrics = groupId %% "akka-cluster-metrics" % version
       val cluster_tools = groupId  %% "akka-cluster-tools" % version
+      val http = groupId  %% "akka-http-experimental" % version
+      val http_json = groupId %% "akka-http-spray-json-experimental" % version
       val multi_node_testkit = groupId %%  "akka-multi-node-testkit" % version
       val testKit = groupId %% "akka-testkit" % version % "test"
 
@@ -24,6 +26,16 @@ object Common {
       val persistencePluginCasbah = "com.github.scullxbones" %% "akka-persistence-mongo-casbah" % "1.3.2"
       val persistencePluginInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % "1.3.10"
     }
+
+    object Spray {
+      val resolver = "spray repo" at "http://repo.spray.io"
+      val groupId = "io.spray"
+      val version = "1.3.2"
+      val http = groupId %% "spray-http" % version
+      val httpx = groupId %% "spray-httpx" % version
+      val json = groupId %% "spray-json" % version
+    }
+
 
 
     object Plugins {
