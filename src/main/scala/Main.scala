@@ -28,35 +28,59 @@ object TheApp {
   def startup(ports: Seq[String], httpPorts: Seq[String]): Unit = {
     require(ports.length == httpPorts.length)
     (ports zip httpPorts) foreach { case (port, httpPort) =>
-      // Override the configuration of the port
+
       val config = ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port).
         withFallback(ConfigFactory.load())
 
-      // Create an Akka system
       implicit val system = ActorSystem("MazurDBClusterSystem", config)
-      // Create an actor that handles cluster domain events
       val clusterMember = system.actorOf(Props[ClusterMember], name = "clusterMember")
+      val storage = system.actorOf(Storage.props, name = "storage")
 
       implicit val materializer = ActorMaterializer()
-      // needed for the future map/flatmap in the end
       implicit val executionContext = system.dispatcher     
 
-      val route =
+      implicit val timeout = Timeout(5 seconds)
+      lazy val route =
         path("cluster") {
           get {
-            //complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
 	    implicit val timeout = Timeout(5 seconds)
 	    val membersFuture = (clusterMember ? GetMembers).mapTo[Members]
 	    complete(membersFuture.map{m => m.members.map{x => x.address.hostPort}.mkString("\n")})
           }
+        } ~
+        path("storage" / Segment) { bucketName =>
+          put { //create
+            complete {
+              (storage ? Storage.CreateBucket(bucketName)).mapTo[Storage.Result].map{x=>x.success.toString}
+	    }
+	  } ~
+	  delete { //remove
+            complete {
+              (storage ? Storage.RemoveBucket(bucketName)).mapTo[Storage.Result].map{x=>x.success.toString}
+            }
+	  }
+	} ~
+        path("storage" / Segment / IntNumber) { (bucketName, item)=> //contains
+          get {
+            complete {
+              (storage ? Storage.Contains(bucketName, item)).mapTo[Storage.Result].map{x=>x.success.toString}
+	    }
+          }
+        } ~ 
+        path("storage" / Segment / IntNumber) { (bucketName, item)=> //insert
+          post {
+	    complete {
+              (storage ? Storage.Insert(bucketName, item)).mapTo[Storage.Result].map{x=>x.success.toString}
+	    }
+	  }
         }
 
       val bindingFuture = Http().bindAndHandle(route, "localhost", httpPort.toInt)
       println(s"HTTP server online at http://localhost:$httpPort/\nPress RETURN to stop...")
-      scala.io.StdIn.readLine() // let it run until user presses return
+      scala.io.StdIn.readLine() 
       bindingFuture
-        .flatMap(_.unbind()) // trigger unbinding from the port
-        .onComplete(_ => system.terminate()) // and shutdown when done
+        .flatMap(_.unbind())
+        .onComplete(_ => system.terminate())
     }
   }
 
