@@ -1,6 +1,7 @@
 package org.mazurdb
 
 import akka.actor._
+import akka.persistence._
 
 object Storage {
   trait Request
@@ -14,17 +15,28 @@ object Storage {
   trait Response
   case class Result(success: Boolean) extends Response
 
-  def props = Props[Storage]
+  def props(id:String) = Props(new Storage(id))
 }
 
-class Storage extends Actor with ActorLogging {
+class Storage(persId:String) extends PersistentActor with ActorLogging {
   import Storage._
 
   type Set = collection.mutable.Set[Int]
+  type BucketType = collection.mutable.Map[String, Set]
   
-  val buckets = collection.mutable.Map.empty[String, Set]
+  var buckets: BucketType = collection.mutable.Map[String, Set]()
 
-  override def receive = {
+  override def persistenceId = persId
+
+  val receiveRecover: Receive = {
+    case evt: Command                           => updateBuckets(evt)
+    //TODO add snapshot support
+    //case SnapshotOffer(_, snapshotBucketType) => buckets = snapshot.asInstanceOf[BucketType]
+  }
+
+
+  //TODO do refactoring
+  def updateBuckets(cmd:Command) = cmd match {
     case CreateBucket(name:String) => {
       sender ! (buckets.get(name) match {
         case Some(bucket) => {
@@ -66,6 +78,17 @@ class Storage extends Actor with ActorLogging {
         }
       })
     }
+  }
+
+  val receiveCommand: Receive = {
+    case msg@CreateBucket(name:String) => 
+      persist(msg) (updateBuckets)
+
+    case msg@RemoveBucket(name:String) => 
+      persist(msg) (updateBuckets)
+
+    case msg@Insert(name:String, data:Int) =>       
+      persist(msg) (updateBuckets)
 
     case Contains(name:String, data:Int) => {
       sender ! (buckets.get(name) match {
@@ -79,4 +102,7 @@ class Storage extends Actor with ActorLogging {
       })
     }
   }
+/*
+  override def receive = {
+*/
 }

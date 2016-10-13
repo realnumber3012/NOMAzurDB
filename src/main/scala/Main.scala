@@ -34,7 +34,7 @@ object TheApp {
 
       implicit val system = ActorSystem("MazurDBClusterSystem", config)
       val clusterMember = system.actorOf(Props[ClusterMember], name = "clusterMember")
-      val storage = system.actorOf(Storage.props, name = "storage")
+      val storage = system.actorOf(Storage.props(port), name = "storage")
 
       implicit val materializer = ActorMaterializer()
       implicit val executionContext = system.dispatcher     

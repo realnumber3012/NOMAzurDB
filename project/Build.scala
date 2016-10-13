@@ -25,6 +25,8 @@ object Common {
       val imMemoryPersistenceResolver = "dnvriend at bintray" at "http://dl.bintray.com/dnvriend/maven"
       val persistencePluginCasbah = "com.github.scullxbones" %% "akka-persistence-mongo-casbah" % "1.3.2"
       val persistencePluginInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % "1.3.10"
+      val persistencePluginLevelDB = "org.iq80.leveldb" % "leveldb" % "0.7"
+      val persistencePluginLevelDBJNI = "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8"
     }
 
     object Spray {
