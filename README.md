@@ -1,15 +1,19 @@
 ## NOMAzurDB ##
 
--- Demo: --
+Demo:
+
 Required: sbt
 
 Start rub.bat/run.sh
 
-- create bucket with name "demobucket"
-curl -XPUT http://localhost:14780/storage/demobucket
+create bucket with name "demobucket":
 
-- add element to bucket
-curl -XPOST http://localhost:14780/storage/demobucket/13
+```curl -XPUT http://localhost:14780/storage/demobucket```
 
-- test element in the bucket
-curl -XGET http://localhost:14780/storage/demobucket/13
+add element to bucket:
+
+```curl -XPOST http://localhost:14780/storage/demobucket/13```
+
+test element in the bucket:
+
+```curl -XGET http://localhost:14780/storage/demobucket/13```
