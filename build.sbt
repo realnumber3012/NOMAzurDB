@@ -23,6 +23,7 @@ libraryDependencies ++= Seq(
   Akka.testKit,
   Akka.http,
   Akka.http_json,
+  Akka.ddata,
   //Akka.persistencePluginCasbah,
   //Akka.persistencePluginInMemory % "test"
   Akka.persistencePluginLevelDB,

@@ -19,6 +19,7 @@ object Common {
       val cluster_tools = groupId  %% "akka-cluster-tools" % version
       val http = groupId  %% "akka-http-experimental" % version
       val http_json = groupId %% "akka-http-spray-json-experimental" % version
+      val ddata = groupId %% "akka-distributed-data-experimental" % version
       val multi_node_testkit = groupId %%  "akka-multi-node-testkit" % version
       val testKit = groupId %% "akka-testkit" % version % "test"
 
